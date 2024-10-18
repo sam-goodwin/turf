@@ -37,8 +37,8 @@
         #error "Unrecognized platform!"
     #endif
 
-#elif defined(__GNUC__)
-    // GCC compiler family
+#elif defined(__GNUC__) || defined(__clang__)
+    // GCC or Clang compiler family
     #define TURF_COMPILER_GCC 1
     #ifndef TURF_HAS_STDINT
         #define TURF_HAS_STDINT 1
@@ -60,7 +60,7 @@
         #define TURF_KERNEL_LINUX 1
     #endif
     #if defined(__MACH__)
-        // Mach kernel, eg. Apple MacOS/iOS
+        // Mach kernel, e.g., Apple MacOS/iOS
         #define TURF_KERNEL_MACH 1
     #endif
     #if defined(__MINGW32__) || defined(__MINGW64__)
@@ -68,15 +68,16 @@
         #define TURF_TARGET_MINGW 1
         #define TURF_TARGET_POSIX 1
     #endif
-    #if defined(__x86_64__)
+    // CPU Architecture Detection
+    #if defined(__x86_64__) || defined(_M_X64)
         // x64
         #define TURF_CPU_X64 1
         #define TURF_PTR_SIZE 8
-    #elif defined(__i386__)
+    #elif defined(__i386__) || defined(_M_IX86)
         // x86
         #define TURF_CPU_X86 1
         #define TURF_PTR_SIZE 4
-    #elif defined(__arm__)
+    #elif defined(__arm__) || defined(_M_ARM)
         // ARM
         #define TURF_CPU_ARM 1
         #define TURF_PTR_SIZE 4
@@ -90,26 +91,27 @@
             // Could support earlier ARM versions at some point using compiler barriers and swp instruction
             #error "Unrecognized ARM CPU architecture version!"
         #endif
-        #if defined(__thumb__)
+        #if defined(__thumb__) || defined(__thumb)
             // Thumb instruction set mode
             #define TURF_CPU_ARM_THUMB 1
         #endif
-    #elif defined(__arm64__)
-        // ARM64
+    #elif defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64)
+        // ARM64 (Including Apple Silicon)
         #define TURF_CPU_ARM64 1
         #define TURF_PTR_SIZE 8
-        #if defined(__ARM64_ARCH_8__)
+        #if defined(__ARM64_ARCH_8__) || defined(__aarch64__) || defined(__ARM_ARCH_8__)
             // ARMv8
             #define TURF_CPU_ARM_VERSION 8
         #else
             #error "Unrecognized ARM64 CPU architecture version!"
         #endif
     #elif defined(__powerpc__) || defined(__POWERPC__) || defined(__PPC__)
+        // PowerPC
         #define TURF_CPU_POWERPC 1
-        #if defined(__powerpc64__)
-          #define TURF_PTR_SIZE 8
+        #if defined(__powerpc64__) || defined(__PPC64__)
+            #define TURF_PTR_SIZE 8
         #else
-          #define TURF_PTR_SIZE 4 // 32-bit architecture
+            #define TURF_PTR_SIZE 4 // 32-bit architecture
         #endif
     #else
         #error "Unrecognized target CPU!"
